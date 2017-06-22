@@ -10,32 +10,54 @@ mongoose.connect('mongodb://localhost:27017/TodoApp');
 //  // Second argument here is the Schema/Object
 var Todo = mongoose.model('Todo',{
     text : {
-        type:String
+        type:String,
+        required : true,
+        trim : true,
+        minlength : 1
     },
     completed : {
-        type : Boolean
+        type : Boolean,
+        default : false
     },
     completedAt :
     {
-        type : Number
+        type : Number,
+        default : null
+    }
+});
+
+
+var User = mongoose.model('User', {
+    email : {
+        type : String,
+        required : true,
+        trim : true,
+        minlength : 1
     }
 });
 
 
 // Now can instatiate a model
 var newTodo = new Todo({
-    text : 'Go out to dinner'
+    text : '          New todo with validation    '
 });
+
+var newUser = new User({email:'     aaronbrightman@gmail.com                '});
+
 
 
 // thats all
 newTodo.save()
 .then(document=>{
-    console.log(document);
-    console.log(JSON.stringify(document,undefined,2));
+   console.log(JSON.stringify(document,undefined,2));
 }
 ,err=>console.log(err));
 
 
+newUser.save()
+.then(document=>{
+   console.log(JSON.stringify(document,undefined,2));
+}
+,err=>console.log(err));
 
 
