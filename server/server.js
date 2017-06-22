@@ -31,6 +31,11 @@ var newTodo = new Todo({
 // thats all
 newTodo.save()
 .then(document=>{
-    console.log(document)
-},err=>{console.log(err)});
+    console.log(document);
+    console.log(JSON.stringify(document,undefined,2));
+}
+,err=>console.log(err));
+
+
+
 
