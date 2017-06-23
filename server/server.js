@@ -30,3 +30,6 @@ app.listen(ListeningPort,()=>{
     console.log('You are connected to port '+ ListeningPort);
 });
 
+
+module.exports = {app};
+
