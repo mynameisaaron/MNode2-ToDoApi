@@ -7,9 +7,24 @@ const { Todo } = require('../models/Todo');
 //MOCHA/SUPERTEST TESTING 
 
 ///////////////////////
+
+const to_dos = 
+[
+    {
+        text:'This is todo number 1'
+    },
+    {
+        text:'This is todo number 2'
+    }
+
+]
+
 beforeEach(done => {
     Todo.remove({})
-        .then(() => done())
+    .then(()=>
+        Todo.insertMany(to_dos)
+    )
+    .then(()=>done());
 });
 //////////////////////
 
@@ -33,7 +48,7 @@ describe('Testing the POST - Todos endpoint', () => {
                     return done(err);
                 }
 
-                Todo.find()
+                Todo.find({text})
                     .then(todos => {
                         expect(todos.length).toBe(1);
                         expect(todos[0].text).toBe(text);
@@ -59,7 +74,7 @@ describe('Testing the POST - Todos endpoint', () => {
 
             Todo.find()
             .then(todos => {
-                expect(todos.length).toBe(0);
+                expect(todos.length).toBe(2);
                 done();
                 
             })
@@ -68,6 +83,25 @@ describe('Testing the POST - Todos endpoint', () => {
         });
 
     });
+
+});
+
+describe('Testing the GET - Todos endpoint',()=>{
+it('Should get all of the todos',done=>{
+
+
+    request(app)
+    .get('/todos')
+    .expect(200)
+    .expect(res=>{
+        expect(res.body.length).toBe(2);
+        
+    })
+    .end(done);
+
+
+});
+
 
 });
 
