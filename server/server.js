@@ -47,7 +47,7 @@ app.get('/todos/:id',(req,res,next)=>{
         }
         res.send(singleObject);
     })
-    .catch(,e=>res.status(400).send())
+    .catch(e=>res.status(400).send())
 });
 
 
