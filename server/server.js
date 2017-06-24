@@ -5,6 +5,7 @@ var {mongoose} = require('./db/mongoose');
 var {Todo} = require('./models/Todo');
 var {User} = require('./models/User');
 
+var {ObjectID} = require('mongodb');
 
 var app = express();
 
@@ -30,15 +31,23 @@ app.get('/todos',(req,res,next)=>{
 
 app.get('/todos/:id',(req,res,next)=>{
     var TodoID = req.params.id;
+
+    var isValid = ObjectID.isValid(TodoID);
+
+    if(!isValid)
+    {
+        res.status(404).send();
+    }
     
     Todo.findById(TodoID)
     .then(singleObject=>{
         if(!singleObject)
         {
-           return res.status(404).send("Not Found");
+           return res.status(404).send();
         }
         res.send(singleObject);
-    },e=>{res.send(e)})
+    })
+    .catch(,e=>res.status(400).send())
 });
 
 
