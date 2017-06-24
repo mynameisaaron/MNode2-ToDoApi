@@ -28,6 +28,21 @@ app.get('/todos',(req,res,next)=>{
         .then(todos=>{res.send(todos)}, e=>{res.status(400).send(e)});
 });
 
+app.get('/todos/:id',(req,res,next)=>{
+    var TodoID = req.params.id;
+    
+    Todo.findById(TodoID)
+    .then(singleObject=>{
+        if(!singleObject)
+        {
+           return res.status(404).send("Not Found");
+        }
+        res.send(singleObject);
+    },e=>{res.send(e)})
+});
+
+
+
 /////////////////////////////////////
 /////////////////////////////////////
 var ListeningPort = 3000;
