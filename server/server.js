@@ -52,9 +52,8 @@ app.get('/todos/:id',(req,res,next)=>{
 
 
 
-/////////////////////////////////////
-/////////////////////////////////////
-var ListeningPort = 3000;
+
+var ListeningPort = process.env.PORT || 3000;
 app.listen(ListeningPort,()=>{
     console.log('You are connected to port '+ ListeningPort);
 });
