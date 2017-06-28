@@ -5,9 +5,7 @@ const { app } = require('../server');
 const { Todo } = require('../models/Todo');
 
 const { ObjectID } = require('mongodb');
-//MOCHA/SUPERTEST TESTING 
 
-///////////////////////
 
 const to_dos =
     [
@@ -20,16 +18,18 @@ const to_dos =
             text: 'This is todo number 2'
         }
 
-    ]
+    ];
+
+
 
 beforeEach(done => {
-    Todo.remove({})
-        .then(() =>
-            Todo.insertMany(to_dos)
-        )
-        .then(() => done());
+    Todo.remove({}).then(() =>
+
+        Todo.insertMany(to_dos)
+
+    ).then(() => done());
 });
-//////////////////////
+
 
 describe('Testing the POST - Todos endpoint', () => {
 
@@ -45,6 +45,7 @@ describe('Testing the POST - Todos endpoint', () => {
             .expect(res => {
                 expect(res.body.text).toBe(text);
             })
+            //*** IN TEST SETTING REMEMBER THAT QUERRY TO DATABASE IS IN THE .END() VERBOSE FORM
             .end((err, res) => {
 
                 if (err) {
@@ -112,7 +113,7 @@ describe('Testing the GET/id - Todos endpoint', () => {
 
     it('Get a single record by id and checking by text property', (done) => {
 
-            // to hexstring call not exactly nessisary here becuase the concating with the string already casts it
+        // to hexstring call not exactly nessisary here becuase the concating with the string already casts it
         request(app)
             .get(`/todos/${to_dos[0]._id.toHexString()}`)
             .expect(200)
@@ -123,7 +124,7 @@ describe('Testing the GET/id - Todos endpoint', () => {
 
     });
 
-    it('Return a 404 when id is valid but not found',done=>{
+    it('Return a 404 when id is valid but not found', done => {
         var validIdObject = new ObjectID();
         var validIdObject_String = validIdObject.toHexString();
 
@@ -134,14 +135,58 @@ describe('Testing the GET/id - Todos endpoint', () => {
 
     });
 
-    it('Return a 404 when url is valid but non-id',done=>{
+    it('Return a 404 when url is valid but non-id', done => {
 
         request(app)
-        .get('/todos/123')
-        .expect(404)
-        .end(done);
+            .get('/todos/123')
+            .expect(404)
+            .end(done);
 
     });
+});
+
+describe('Testing the DELETE/id - Todos endpoint', () => {
+
+    it('Deletes Todo Object by ID', done => {
+        request(app)
+            .delete(`/todos/${to_dos[0]._id}`)
+            .expect(200)
+            .expect(res =>
+                expect(res.body._id).toBe(to_dos[0]._id.toHexString())
+            )
+            //*** IN TEST SETTING REMEMBER THAT QUERRY TO DATABASE IS IN THE .END() VERBOSE FORM
+            .end((err, res) => {
+                if (err) {
+                    return done(err);
+                }
+                Todo.findById(to_dos[0]._id.toHexString())
+                    .then(nullDocument => {
+                        expect(nullDocument).toNotExist();
+                        done();
+                    })
+                    .catch(e => done(e))
+
+            });
+    });
+
+    it('Should return 404 if id is not found', done => {
+
+        var validId = new ObjectID().toHexString();
+
+        request(app)
+            .delete(`/todos/${validId}`)
+            .expect(404)
+            .end(done);
+    });
+
+    it('Should return 404 if id is invalid', done => {
+        request(app)
+            .delete('/todos/abc')
+            .expect(404)
+            .end(done);
+    });
+
+
 });
 
 
