@@ -1,3 +1,4 @@
+var _ = require('lodash');
 var express = require('express');
 var bodyParser = require('body-parser');
 
@@ -68,6 +69,43 @@ app.delete('/todos/:id',(req,res,next)=>{
     })
     .catch(e => res.status(400).send());
 
+});
+
+
+//PATCH/UPDATE ENDPOINT IS SPECIAL  
+//  user lowdash _.pick() return new object with only these two properties present 'text' and 'completed'
+//  ALSO NOTICE that Todo.findByIdAndUpdate(_id,{$set:body},{new:true})
+//  {new:true} config object is the differnt way to return the new document ,, same result as {returnOriginal:false}
+//      
+app.patch('/todos/:id',(req,res,next)=>{
+    var _id = req.params.id;
+    var body = _.pick(req.body,['text','completed']);
+
+    if(!ObjectID.isValid(_id))
+    {
+        return res.status(404).send();
+    }
+
+    if(_.isBoolean(body.completed) && body.completed === true)
+    {
+        body.completedAt = new Date().getTime();
+    }
+    else
+    {
+        body.completed = false;
+        body.completedAt = null
+    }
+
+    Todo.findByIdAndUpdate(_id,{$set:body},{new:true})
+    .then(newDocument=>{
+
+        if(!newDocument){
+            return res.status(404).send();
+        }
+
+        return res.send(newDocument);
+    })
+    .catch(e => res.status(400).send());
 });
 
 
