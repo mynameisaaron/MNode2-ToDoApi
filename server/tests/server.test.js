@@ -15,7 +15,9 @@ const to_dos =
         },
         {
             _id: new ObjectID(),
-            text: 'This is todo number 2'
+            text: 'This is todo number 2',
+            completed : true,
+            completedAt : 333
         }
 
     ];
@@ -145,6 +147,7 @@ describe('Testing the GET/id - Todos endpoint', () => {
     });
 });
 
+
 describe('Testing the DELETE/id - Todos endpoint', () => {
 
     it('Deletes Todo Object by ID', done => {
@@ -191,7 +194,78 @@ describe('Testing the DELETE/id - Todos endpoint', () => {
 
 
 
+describe('Testing the PATCH/id - Todos endpoint',()=>{
 
+    it('Will Update text and completed properties of the Todo document',done=>{
+
+        var updateObject = {text:'UPUPDATED', completed:true}
+
+        request(app)
+            .patch(`/todos/${to_dos[0]._id}`)
+            .send(updateObject)
+            .expect(200)
+            .expect(res=>{
+                expect(res.body.text).toBe('UPUPDATED');
+                expect(res.body.completed).toBe(true);
+
+            })
+            .end((err,res)=>{
+                if(err)
+                {
+                    return done(err);
+                }
+
+                Todo.findById(to_dos[0]._id.toHexString())
+                .then(document=>{
+                    expect(document.text).toBe('UPUPDATED');
+                    expect(document.completed).toBe(true);
+                    done();
+                })
+                .catch(e => done(e));
+
+            });
+
+    });
+
+    it('It Will Changed Text and Completed at to false', done=>{
+
+        var updateObject = {
+            text:"UPDATED and Completed set to false",
+            completed:false
+        };
+
+        request(app)
+        .patch(`/todos/${to_dos[1]._id}`)
+        .send(updateObject)
+        .expect(200)
+        .expect(res=>{
+            expect(res.body.text).toBe("UPDATED and Completed set to false");
+            expect(res.body.completed).toBe(false);
+            expect(res.body.completedAt).toBe(null);
+
+        })
+        .end((err,res)=>{
+
+            if(err){
+                return done(err);
+            }
+
+            Todo.findById(to_dos[1]._id.toHexString())
+            .then(document =>{
+                
+                expect(document.text).toBe(updateObject.text);
+                expect(document.completed).toBe(false);
+                expect(document.completedAt).toBe(null);
+                done();
+
+            })
+
+        });
+
+
+    })
+
+});
 
 
 
