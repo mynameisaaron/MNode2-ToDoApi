@@ -111,6 +111,23 @@ app.patch('/todos/:id',(req,res,next)=>{
 });
 
 
+///////////USERS API ENDPOINTS//////////
+////////////////////////////////////////
+
+app.post('/users',(req,res,next)=>{
+    var body = _.pick(req.body,['email', 'password']);
+
+    var newUser = new User(body);
+    newUser.save()
+    .then(document=>res.status(201).send(document))
+    .catch(e=>res.status(400).send(e));
+
+});
+
+
+////////////////////////////////////////
+
+
 
 
 var ListeningPort = process.env.PORT || 3000;
