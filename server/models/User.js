@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 
 const jwt = require('jsonwebtoken');
+const _ = require('lodash');
 
 // We want to 'tack-on' some custom methods to the model
 //   SO > we need to user the mongoose.Schema constructor method to create mongoose model
@@ -49,6 +50,19 @@ var UserSchema = new mongoose.Schema({
         
     }]
 })
+
+
+//HERE WE WANT TO OVERRIDE THE USER.TOJSON METHOD, TO LIMIT THE INFORMATION SETBACK FROM A POST
+// ONLY SENDS BACK EMAIL (NO PASSWORD OR TOKENS)
+UserSchema.methods.toJSON = function(){
+    var user = this;
+
+    var userObject = user.toObject();
+
+    return _.pick(userObject,['_id', 'email']);
+}
+
+
 
 // UserSchema.methods is an object, can add all the instance methods to objects here!
         //SIDENOTE , Arrow functions 'do not bind the 'THIS' keyword'   We need to bind the 'this' keyword
