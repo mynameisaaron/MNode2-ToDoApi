@@ -111,16 +111,36 @@ app.patch('/todos/:id',(req,res,next)=>{
 });
 
 
+
+
+
+
+
 ///////////USERS API ENDPOINTS//////////
 ////////////////////////////////////////
 
 app.post('/users',(req,res,next)=>{
     var body = _.pick(req.body,['email', 'password']);
 
-    var newUser = new User(body);
-    newUser.save()
-    .then(document=>res.status(201).send(document))
+    var user = new User(body);
+    user.save()
+    .then(()=>{
+        //remember that when you call this method, its is directly on the object, not on the 'methods' property!
+       return user.generateAuthToken();
+    })
+    .then(token =>
+        res.status(201).header('x-auth',token).send(user)
+    )
     .catch(e=>res.status(400).send(e));
+    
+    
+    // newUser.methods.generateAuthToken()
+    // .then(document=>res.status(201).send(document))
+    // .catch(e=>res.status(400).send(e));
+    
+    // newUser.save()
+    // .then(document=>res.status(201).send(document))
+    // .catch(e=>res.status(400).send(e));
 
 });
 

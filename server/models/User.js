@@ -1,7 +1,14 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 
-var User = mongoose.model('User', {
+const jwt = require('jsonwebtoken');
+
+// We want to 'tack-on' some custom methods to the model
+//   SO > we need to user the mongoose.Schema constructor method to create mongoose model
+//       , in order to add functions/methods to the model
+
+
+var UserSchema = new mongoose.Schema({
     email : {
         type : String,
         required : true,
@@ -41,6 +48,28 @@ var User = mongoose.model('User', {
         
         
     }]
-});
+})
+
+// UserSchema.methods is an object, can add all the instance methods to objects here!
+        //SIDENOTE , Arrow functions 'do not bind the 'THIS' keyword'   We need to bind the 'this' keyword
+        //  NEED TO BIND 'THIS' TO THE INSTANCE OF THIS MODEL
+UserSchema.methods.generateAuthToken = function(){
+//ex of sidenote >   var user = this;
+var user = this;
+
+var access = 'auth';
+var token = jwt.sign({ _id:user._id.toHexString(), access}, 'SaltString').toString();
+
+user.tokens.push({access,token});
+
+//this is returning a promise with the token passed in
+return user.save().then(() => {
+     return token;
+   });
+// 'token' is passed in as the next success argument for the promise
+
+}
+
+var User = mongoose.model('User', UserSchema);
 
 module.exports = {User};
