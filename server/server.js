@@ -1,5 +1,7 @@
 require('./config/config');
 
+
+
 var _ = require('lodash');
 var express = require('express');
 var bodyParser = require('body-parser');
@@ -7,10 +9,13 @@ var bodyParser = require('body-parser');
 var { mongoose } = require('./db/mongoose');
 var { Todo } = require('./models/Todo');
 var { User } = require('./models/User');
+var {authenticate} = require('./middleware/authenticate');
 
 var { ObjectID } = require('mongodb');
 
 var app = express();
+
+
 
 /////////////////////////////////////
 /////////////////////////////////////
@@ -132,20 +137,13 @@ app.post('/users', (req, res, next) => {
 });
 /////////////////////////////////////////////
 
-app.get('/users/me', (req, res, next) => {
 
-    var authToken = req.header('x-auth');
 
-   User.findByToken(authToken)
-   .then(user =>{
+app.get('/users/me', authenticate, (req, res, next) => {
 
-        
-       res.send(user);
-   })
-   .catch(e=>res.status(401).send());
+    res.send(req.user);
 
-    
-    
+
 
 });
 

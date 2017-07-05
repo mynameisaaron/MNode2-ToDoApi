@@ -43,18 +43,9 @@ var UserSchema = new mongoose.Schema({
 
 
     }]
-})
+});
 ///////////////////////////////////////////////////////////////////////////////
 // HERE WE ARE GOING TO MAKE A STATIC METHOD FOR USER, TO FIND BY TOKEN 
-
-// UserSchema.statics.findByToken = function (token) {
-//     var User = this;
-
-//     var UserId = jwt.verify(token, 'SaltString')._id;
-
-//    return User.findOne({_id:UserId});
-
-
 
 UserSchema.statics.findByToken = function (token) {
     var User = this;
