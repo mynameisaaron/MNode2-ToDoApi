@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 const jwt = require('jsonwebtoken');
 const _ = require('lodash');
-
+const bcrypt = require('bcryptjs');
 
 var UserSchema = new mongoose.Schema({
     email: {
@@ -58,7 +58,7 @@ UserSchema.statics.findByToken = function (token) {
         //return new Promise((resolve,reject)=>{reject()});
         // also can write this as
         return Promise.reject();
-        
+
     }
 
     return User.findOne({
@@ -91,5 +91,31 @@ UserSchema.methods.generateAuthToken = function () {
 }
 
 var User = mongoose.model('User', UserSchema);
+
+
+//////
+
+UserSchema.pre('save', function (next) {
+    var user = this;
+    
+    // Looks like it checks if record isModified or isNEW
+    if (user.isModified('password')) {
+
+        bcrypt.genSalt(10, (err, salt) => {
+            bcrypt.hash(user.password, salt, (err, hash) => {
+                user.password = hash;
+                next();
+            })
+        });
+
+    }
+    else {
+        next();
+    }
+
+});
+
+/////
+
 
 module.exports = { User };
