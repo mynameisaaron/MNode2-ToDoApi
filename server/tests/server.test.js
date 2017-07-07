@@ -5,7 +5,6 @@ const { Todo } = require('../models/Todo');
 const { ObjectID } = require('mongodb');
 const { to_dos, populateTodos, users, populateUsers, token } = require('./seed/seed');
 
-
 beforeEach(populateTodos);
 beforeEach(populateUsers);
 
@@ -239,37 +238,17 @@ describe('Testing the PATCH/id - Todos endpoint', () => {
 
 });
 
-// describe('Testing the user/me endpoint', () => {
-
-//     it('Should return user if authenticated', done => {
-
-//         request(app)
-//             .get('/users/me')
-//             .set('x-auth', UserArray[0].tokens[0].token.toString())
-//             .expect(res => {
-//                 console.log(res);
-//                 console.log(UserArray[0].tokens[0].token);
-//                 expect(res.body._id).toBe(UserArray[0]._id.toHexString())
-//             })
-//             .end(done);
-
-//     });
-
-
-// });
-
-
 describe('GET /users/me', () => {
-  it('should return user if authenticated', (done) => {
-    request(app)
-      .get('/users/me')
-      .set('x-auth', users[0].tokens[0].token)
-      .expect(200)
-      .expect((res) => {
-        expect(res.body._id).toBe(users[0]._id.toHexString());
-        expect(res.body.email).toBe(users[0].email);
-      })
-      .end(done);
-  });
+    it('should return user if authenticated', (done) => {
+        request(app)
+            .get('/users/me')
+            .set('x-auth', users[0].tokens[0].token)
+            .expect(200)
+            //   .expect((res) => {
+            //     expect(res.body._id).toBe(users[0]._id.toHexString());
+            //     expect(res.body.email).toBe(users[0].email);
+            .end(done);
+    })
 
 });
+

@@ -1,24 +1,18 @@
 require('./config/config');
-
-
-
 var _ = require('lodash');
 var express = require('express');
 var bodyParser = require('body-parser');
-
 var { mongoose } = require('./db/mongoose');
 var { Todo } = require('./models/Todo');
 var { User } = require('./models/User');
-var {authenticate} = require('./middleware/authenticate');
-
+var { authenticate } = require('./middleware/authenticate');
 var { ObjectID } = require('mongodb');
+const bcrypt = require('bcryptjs');
 
 var app = express();
 
 
 
-/////////////////////////////////////
-/////////////////////////////////////
 app.use(bodyParser.json());
 
 app.post('/todos', (req, res, next) => {
@@ -135,9 +129,6 @@ app.post('/users', (req, res, next) => {
 
 
 });
-/////////////////////////////////////////////
-
-
 
 app.get('/users/me', authenticate, (req, res, next) => {
 
@@ -146,6 +137,25 @@ app.get('/users/me', authenticate, (req, res, next) => {
 
 
 });
+
+app.post('/users/login', (req, res, next) => {
+    
+    var body = _.pick(req.body, ['email', 'password']);
+
+    User.findByCredentials(body.email,body.password)
+    .then(user=>
+    {
+       return user.generateAuthToken()
+        .then(token=>
+        res.header('x-auth', token).send(user)
+        )
+    })
+    .catch(e=>res.status(400).send());
+
+});
+////////////////
+//!!!!!!!!!!!! REMEMBER TO PASS IN THE E ARGUEMTNT IN THE CATCH STATEMENT (OR WONT RUN)
+
 
 
 ////////////////////////////////////////
@@ -160,4 +170,3 @@ app.listen(ListeningPort, () => {
 
 
 module.exports = { app };
-
