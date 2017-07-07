@@ -4,10 +4,6 @@ const { ObjectID } = require('mongodb');
 
 const jwt = require('jsonwebtoken');
 
-
-
-
-
 const to_dos =
     [
         {
@@ -23,12 +19,11 @@ const to_dos =
 
     ];
 
-
 var UserOneId = new ObjectID();
 var UserTwoId = new ObjectID();
 var access = 'auth';
 var token = jwt.sign({ _id: UserTwoId, access }, 'SaltString').toString();
-const UserArray =
+const users =
     [
         {
             _id : UserOneId,
@@ -45,11 +40,6 @@ const UserArray =
 
     ];
 
-
-
-
-
-
 const populateTodos = (done) => {
     Todo.remove({}).then(() =>
 
@@ -65,8 +55,8 @@ const populateUsers = done => {
 
     User.remove({}).then(()=>{
 
-        var user1 = new User(UserArray[0]).save();
-        var user2 = new User(UserArray[1]).save();
+        var user1 = new User(users[0]).save();
+        var user2 = new User(users[1]).save();
         return Promise.all([user1,user2]);
         
 
@@ -75,4 +65,4 @@ const populateUsers = done => {
 
 };
 
-module.exports = { to_dos, populateTodos, UserArray, populateUsers };
+module.exports = { to_dos, populateTodos, users, populateUsers,};

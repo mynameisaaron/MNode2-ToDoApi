@@ -1,19 +1,13 @@
 const expect = require('expect');
 const request = require('supertest');
-
 const { app } = require('../server');
 const { Todo } = require('../models/Todo');
-
 const { ObjectID } = require('mongodb');
-
-const {to_dos, populateTodos, UserArray, populateUsers} = require('./seed/seed');
-
+const { to_dos, populateTodos, users, populateUsers, token } = require('./seed/seed');
 
 
-
-beforeEach(populateUsers);
 beforeEach(populateTodos);
-
+beforeEach(populateUsers);
 
 describe('Testing the POST - Todos endpoint', () => {
 
@@ -129,7 +123,6 @@ describe('Testing the GET/id - Todos endpoint', () => {
     });
 });
 
-
 describe('Testing the DELETE/id - Todos endpoint', () => {
 
     it('Deletes Todo Object by ID', done => {
@@ -174,84 +167,109 @@ describe('Testing the DELETE/id - Todos endpoint', () => {
 
 });
 
+describe('Testing the PATCH/id - Todos endpoint', () => {
 
+    it('Will Update text and completed properties of the Todo document', done => {
 
-describe('Testing the PATCH/id - Todos endpoint',()=>{
-
-    it('Will Update text and completed properties of the Todo document',done=>{
-
-        var updateObject = {text:'UPUPDATED', completed:true}
+        var updateObject = { text: 'UPUPDATED', completed: true }
 
         request(app)
             .patch(`/todos/${to_dos[0]._id}`)
             .send(updateObject)
             .expect(200)
-            .expect(res=>{
+            .expect(res => {
                 expect(res.body.text).toBe('UPUPDATED');
                 expect(res.body.completed).toBe(true);
 
             })
-            .end((err,res)=>{
-                if(err)
-                {
+            .end((err, res) => {
+                if (err) {
                     return done(err);
                 }
 
                 Todo.findById(to_dos[0]._id.toHexString())
-                .then(document=>{
-                    expect(document.text).toBe('UPUPDATED');
-                    expect(document.completed).toBe(true);
-                    done();
-                })
-                .catch(e => done(e));
+                    .then(document => {
+                        expect(document.text).toBe('UPUPDATED');
+                        expect(document.completed).toBe(true);
+                        done();
+                    })
+                    .catch(e => done(e));
 
             });
 
     });
 
-    it('It Will Changed Text and Completed at to false', done=>{
+    it('It Will Changed Text and Completed at to false', done => {
 
         var updateObject = {
-            text:"UPDATED and Completed set to false",
-            completed:false
+            text: "UPDATED and Completed set to false",
+            completed: false
         };
 
         request(app)
-        .patch(`/todos/${to_dos[1]._id}`)
-        .send(updateObject)
-        .expect(200)
-        .expect(res=>{
-            expect(res.body.text).toBe("UPDATED and Completed set to false");
-            expect(res.body.completed).toBe(false);
-            expect(res.body.completedAt).toBe(null);
-
-        })
-        .end((err,res)=>{
-
-            if(err){
-                return done(err);
-            }
-
-            Todo.findById(to_dos[1]._id.toHexString())
-            .then(document =>{
-                
-                expect(document.text).toBe(updateObject.text);
-                expect(document.completed).toBe(false);
-                expect(document.completedAt).toBe(null);
-                done();
+            .patch(`/todos/${to_dos[1]._id}`)
+            .send(updateObject)
+            .expect(200)
+            .expect(res => {
+                expect(res.body.text).toBe("UPDATED and Completed set to false");
+                expect(res.body.completed).toBe(false);
+                expect(res.body.completedAt).toBe(null);
 
             })
+            .end((err, res) => {
 
-        });
+                if (err) {
+                    return done(err);
+                }
+
+                Todo.findById(to_dos[1]._id.toHexString())
+                    .then(document => {
+
+                        expect(document.text).toBe(updateObject.text);
+                        expect(document.completed).toBe(false);
+                        expect(document.completedAt).toBe(null);
+                        done();
+
+                    })
+
+            });
 
 
     })
 
 });
 
+// describe('Testing the user/me endpoint', () => {
+
+//     it('Should return user if authenticated', done => {
+
+//         request(app)
+//             .get('/users/me')
+//             .set('x-auth', UserArray[0].tokens[0].token.toString())
+//             .expect(res => {
+//                 console.log(res);
+//                 console.log(UserArray[0].tokens[0].token);
+//                 expect(res.body._id).toBe(UserArray[0]._id.toHexString())
+//             })
+//             .end(done);
+
+//     });
 
 
+// });
 
 
+describe('GET /users/me', () => {
+  it('should return user if authenticated', (done) => {
+    request(app)
+      .get('/users/me')
+      .set('x-auth', users[0].tokens[0].token)
+      .expect(200)
+      .expect((res) => {
+        expect(res.body._id).toBe(users[0]._id.toHexString());
+        expect(res.body.email).toBe(users[0].email);
+      })
+      .end(done);
+  });
 
-
+});
