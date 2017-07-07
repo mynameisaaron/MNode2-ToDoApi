@@ -6,31 +6,13 @@ const { Todo } = require('../models/Todo');
 
 const { ObjectID } = require('mongodb');
 
-
-const to_dos =
-    [
-        {
-            _id: new ObjectID(),
-            text: 'This is todo number 1'
-        },
-        {
-            _id: new ObjectID(),
-            text: 'This is todo number 2',
-            completed : true,
-            completedAt : 333
-        }
-
-    ];
+const {to_dos, populateTodos} = require('./seed/seed');
 
 
 
-beforeEach(done => {
-    Todo.remove({}).then(() =>
 
-        Todo.insertMany(to_dos)
 
-    ).then(() => done());
-});
+beforeEach(populateTodos);
 
 
 describe('Testing the POST - Todos endpoint', () => {
