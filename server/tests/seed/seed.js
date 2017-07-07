@@ -1,6 +1,8 @@
-
+const { User } = require('./../../models/User');
 const { Todo } = require('./../../models/Todo');
 const { ObjectID } = require('mongodb');
+
+const jwt = require('jsonwebtoken');
 
 
 
@@ -22,6 +24,32 @@ const to_dos =
     ];
 
 
+var UserOneId = new ObjectID();
+var UserTwoId = new ObjectID();
+var access = 'auth';
+var token = jwt.sign({ _id: UserTwoId, access }, 'SaltString').toString();
+const UserArray =
+    [
+        {
+            _id : UserOneId,
+            email : 'This@isTheEmailOfAHashedPass.com',
+            password : 'Another123PassA',
+            tokens : [{access,token}]
+         },
+        
+        {
+            _id : UserTwoId,
+            email: 'This@isaemail.com',
+            password: 'APassword123'
+        }
+
+    ];
+
+
+
+
+
+
 const populateTodos = (done) => {
     Todo.remove({}).then(() =>
 
@@ -30,4 +58,21 @@ const populateTodos = (done) => {
     ).then(() => done());
 }
 
-module.exports = {to_dos, populateTodos};
+//populate users will have to be coded differently inorder to run its middleware, to hash the password
+//  will user the Promise.all[array of promised].then .. utility method
+
+const populateUsers = done => {
+
+    User.remove({}).then(()=>{
+
+        var user1 = new User(UserArray[0]).save();
+        var user2 = new User(UserArray[1]).save();
+        return Promise.all([user1,user2]);
+        
+
+    })
+    .then(()=>done());
+
+};
+
+module.exports = { to_dos, populateTodos, UserArray, populateUsers };
